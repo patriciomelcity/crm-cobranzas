@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRM Cobranzas — Mel City SA</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<style>
+:root{--bg:#0f1117;--surface:#181c27;--surface2:#1e2335;--border:#2a2f45;--border2:#353b55;--text:#e8eaf2;--muted:#7a80a0;--accent:#4f7cff;--accent2:#3d62d4;--danger:#ff5a5a;--warning:#f0a500;--success:#2ecc88;--font:"DM Sans",sans-serif;--mono:"DM Mono",monospace;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;min-height:100vh;}
+nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.nav-left{display:flex;align-items:center;}
+.nav-logo-img{height:44px;width:auto;}
+.nav-tabs{display:flex;gap:4px;}
+.nav-tab{padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:var(--muted);border:none;background:none;transition:all .15s;}
+.nav-tab:hover{color:var(--text);background:var(--surface2);}
+.nav-tab.active{color:var(--accent);background:rgba(79,124,255,.12);}
+.nav-date{font-size:12px;color:var(--muted);font-family:var(--mono);}
+.page{display:none;padding:24px;max-width:1400px;margin:0 auto;}
+.page.active{display:block;}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px;margin-bottom:24px;}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;min-width:0;}
+.kpi-label{font-size:10px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;line-height:1.3;}
+.kpi-value{font-size:16px;font-weight:600;line-height:1.2;font-family:var(--mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.kpi-value.danger{color:var(--danger);}
+.kpi-value.warning{color:var(--warning);}
+.kpi-value.accent{color:var(--accent);}
+.section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+.section-title{font-size:16px;font-weight:600;}
+.section-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+.table-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border);}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead tr{background:var(--surface2);}
+th{padding:10px 14px;text-align:left;font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;white-space:nowrap;border-bottom:1px solid var(--border);}
+th.r{text-align:right;}
+td{padding:9px 14px;border-bottom:1px solid var(--border);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:rgba(255,255,255,.02);}
+td.num{font-family:var(--mono);font-size:12px;text-align:right;white-space:nowrap;}
+td.num.d{color:var(--danger);}
+.total-row td{background:var(--surface2);font-weight:600;border-top:1px solid var(--border2);}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500;white-space:nowrap;}
+.bb{background:rgba(79,124,255,.15);color:#7fa4ff;}
+.bg{background:rgba(46,204,136,.15);color:#5de8a8;}
+.ba{background:rgba(240,165,0,.15);color:#f0c050;}
+.br{background:rgba(255,90,90,.15);color:#ff8080;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.form-group{display:flex;flex-direction:column;gap:5px;}
+.form-group.full{grid-column:1/-1;}
+label{font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+input,select,textarea{background:var(--bg);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font);font-size:13px;padding:9px 12px;outline:none;transition:border-color .15s;width:100%;}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);}
+select option{background:var(--surface2);}
+textarea{resize:vertical;min-height:72px;}
+.btn{padding:9px 18px;border-radius:8px;font-family:var(--font);font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .15s;}
+.btn-p{background:var(--accent);color:#fff;}
+.btn-p:hover{background:var(--accent2);}
+.btn-p:disabled{background:var(--border2);color:var(--muted);cursor:not-allowed;}
+.panel-layout{display:grid;grid-template-columns:300px 1fr;gap:16px;align-items:start;}
+@media(max-width:768px){.panel-layout{grid-template-columns:1fr;}.form-grid{grid-template-columns:1fr;}}
+.c-info{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:12px;}
+.c-name{font-size:15px;font-weight:600;margin-bottom:12px;line-height:1.3;}
+.ig{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.il{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:2px;}
+.iv{font-size:14px;font-weight:500;font-family:var(--mono);}
+.iv.sm{font-size:13px;font-family:var(--font);}
+.hist{display:flex;flex-direction:column;gap:8px;}
+.gi{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--border2);border-radius:0 10px 10px 0;padding:12px 14px;}
+.gi.p{border-left-color:var(--success);}
+.gi.n{border-left-color:var(--warning);}
+.gi.d{border-left-color:var(--danger);}
+.gh{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;gap:8px;flex-wrap:wrap;}
+.gm{font-size:11px;color:var(--muted);white-space:nowrap;}
+.gc{font-size:13px;line-height:1.5;margin-top:5px;}
+.gs{font-size:11px;color:var(--muted);margin-top:6px;}
+.gs.v{color:var(--danger);}
+.gs.h{color:var(--warning);}
+.empty-state{text-align:center;padding:32px;color:var(--muted);font-size:13px;}
+.seg-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;cursor:pointer;transition:border-color .15s;}
+.seg-item:hover{border-color:var(--border2);}
+.seg-item.vencido{border-color:rgba(255,90,90,.3);background:rgba(255,90,90,.05);}
+.seg-item.hoy{border-color:rgba(240,165,0,.3);background:rgba(240,165,0,.04);}
+.loader{display:inline-block;width:16px;height:16px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.lo{display:flex;align-items:center;justify-content:center;padding:40px;gap:10px;color:var(--muted);font-size:13px;}
+#toast{position:fixed;bottom:24px;right:24px;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:12px 18px;font-size:13px;font-weight:500;transform:translateY(80px);opacity:0;transition:all .25s;z-index:999;}
+#toast.show{transform:translateY(0);opacity:1;}
+#toast.ok{border-left:3px solid var(--success);color:var(--success);}
+#toast.err{border-left:3px solid var(--danger);color:var(--danger);}
+.lk{cursor:pointer;text-decoration:underline;text-decoration-color:rgba(79,124,255,.4);text-underline-offset:3px;transition:color .15s;}
+.lk:hover{color:var(--accent);}
+.vend-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;}
+.vc{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;}
+.vn{font-size:13px;font-weight:600;margin-bottom:12px;}
+.vr{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;}
+.vr:last-child{border-bottom:none;}
+.vrl{color:var(--muted);}
+.vrv{font-family:var(--mono);font-weight:500;}
+th.av{background:rgba(255,90,90,.08);color:var(--danger) !important;}
+td.av{background:rgba(255,90,90,.04);}
+th.est{background:rgba(46,204,136,.08);color:var(--success) !important;}
+td.est-input{background:rgba(46,204,136,.04);padding:4px 8px;}
+td.est-input input{background:transparent;border:none;border-bottom:1px solid var(--border2);border-radius:0;padding:4px 6px;font-family:var(--mono);font-size:12px;text-align:right;color:var(--text);width:100%;min-width:100px;}
+td.est-input input:focus{border-bottom-color:var(--success);outline:none;}
+.flatpickr-calendar{background:var(--surface2) !important;border:1px solid var(--border2) !important;border-radius:10px !important;box-shadow:0 8px 24px rgba(0,0,0,.4) !important;}
+.flatpickr-day{color:var(--text) !important;border-radius:6px !important;}
+.flatpickr-day:hover{background:var(--border2) !important;}
+.flatpickr-day.selected{background:var(--accent) !important;border-color:var(--accent) !important;}
+.flatpickr-day.today{border-color:var(--accent) !important;}
+.flatpickr-months .flatpickr-month,.flatpickr-weekdays,.flatpickr-weekday{background:var(--surface2) !important;color:var(--muted) !important;fill:var(--muted) !important;}
+.flatpickr-current-month,.flatpickr-current-month .numInputWrapper input,.flatpickr-current-month .cur-month{color:var(--text) !important;}
+.flatpickr-prev-month svg,.flatpickr-next-month svg{fill:var(--muted) !important;}
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-left"><img src="" class="nav-logo-img" alt="Mel City"></div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('dashboard')">Dashboard</button>
+    <button class="nav-tab" onclick="showPage('aging')">Aging</button>
+    <button class="nav-tab" onclick="showPage('clientes')">Clientes</button>
+    <button class="nav-tab" onclick="showPage('seguimientos')">Seguimientos</button>
+  </div>
+  <div class="nav-date" id="nav-date"></div>
+</nav>
+
+<!-- DASHBOARD -->
+<div class="page active" id="page-dashboard">
+  <div class="section-header">
+    <div><div class="section-title">Dashboard de cobranzas</div><div class="section-sub" id="dash-sub"></div></div>
+  </div>
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-label">Deuda total</div><div class="kpi-value accent" id="kpi-total">—</div></div>
+    <div class="kpi"><div class="kpi-label">Deuda vencida</div><div class="kpi-value danger" id="kpi-vencida">—</div></div>
+    <div class="kpi"><div class="kpi-label">% vencido</div><div class="kpi-value warning" id="kpi-pct">—</div></div>
+    <div class="kpi"><div class="kpi-label">Clientes en mora</div><div class="kpi-value danger" id="kpi-mora">—</div></div>
+    <div class="kpi"><div class="kpi-label">Días prom. vencidos</div><div class="kpi-value danger" id="kpi-dias-venc">—</div></div>
+    <div class="kpi"><div class="kpi-label">Días prom. en la calle</div><div class="kpi-value warning" id="kpi-dias-calle">—</div></div>
+    <div class="kpi"><div class="kpi-label">Seguimientos hoy</div><div class="kpi-value warning" id="kpi-segs">—</div></div>
+    <div class="kpi"><div class="kpi-label">Sin gestión 7d</div><div class="kpi-value" id="kpi-sin">—</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+    <div>
+      <div class="section-header"><div class="section-title" style="font-size:14px;">Top 20 — mayor deuda vencida</div></div>
+      <div class="table-wrap"><table>
+        <thead><tr>
+          <th>Cliente</th><th class="r">Días prom.</th><th class="r">Deuda vencida</th><th class="r">Deuda total</th><th>Seguimiento</th>
+        </tr></thead>
+        <tbody id="top20"><tr><td colspan="5"><div class="lo"><div class="loader"></div></div></td></tr></tbody>
+      </table></div>
+    </div>
+    <div>
+      <div class="section-header"><div class="section-title" style="font-size:14px;">Por vendedor</div></div>
+      <div id="vend-cards"><div class="lo"><div class="loader"></div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- AGING -->
+<div class="page" id="page-aging">
+  <div class="section-header">
+    <div><div class="section-title">Aging de deuda</div><div class="section-sub" id="aging-sub"></div></div>
+    <input type="text" id="aging-q" placeholder="Buscar cliente o vendedor..." style="width:260px;" oninput="filterAging()">
+  </div>
+  <div class="table-wrap" id="aging-wrap"></div>
+</div>
+
+<!-- CLIENTES -->
+<div class="page" id="page-clientes">
+  <div class="panel-layout">
+    <div>
+      <div style="margin-bottom:12px;"><input type="text" id="c-q" placeholder="Buscar cliente..." oninput="filterClientes()" style="width:100%;"></div>
+      <div id="c-list" style="display:flex;flex-direction:column;gap:6px;max-height:calc(100vh - 175px);overflow-y:auto;"><div class="lo"><div class="loader"></div></div></div>
+    </div>
+    <div id="c-panel"><div class="empty-state" style="margin-top:60px;"><div style="font-size:32px;margin-bottom:12px;">←</div>Seleccioná un cliente</div></div>
+  </div>
+</div>
+
+<!-- SEGUIMIENTOS -->
+<div class="page" id="page-seguimientos">
+  <div class="section-header"><div><div class="section-title">Seguimientos pendientes</div><div class="section-sub">Vencidos o para hoy — hacé clic para ir al cliente</div></div></div>
+  <div id="segs-list"><div class="lo"><div class="loader"></div></div></div>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+<script>
+const AGING_DATA = {"semanas": ["Vencido", "26/03-28/03", "29/03-04/04", "05/04-11/04", "12/04-18/04", "19/04-25/04", "26/04-02/05", "03/05-09/05"], "clientes": [{"nombre": "CLEANCITI ESCOBAR (EMPRENDIMIENTOS DNT S.R.L.)", "vendedor": "Vendedor", "valores": [13196053.43, 6208096.89, 725014.93, 3607087.23, 5505398.36, 4445980.86, 0.0, 0.0], "total": 33687631.7}, {"nombre": "CLEANCITI EZEIZA (EMILCE NOEMI MEDINA)", "vendedor": "Vendedor", "valores": [9784263.96, 0.0, 400706.0, 0.0, 790274.0, 1416039.0, 0.0, 0.0], "total": 12391282.96}, {"nombre": "CLEANCITI BENAVIDEZ (ROSANNA BEATRIZ PRUDENCIO Y MANNA)", "vendedor": "Vendedor", "valores": [9209598.3, 77640.0, 1016065.87, 1979355.66, 3830314.65, 4812194.2, 0.0, 0.0], "total": 20925168.68}, {"nombre": "CLEANCITI MAXIMO PAZ (JOSE BENITO MEDINA GONZALEZ)", "vendedor": "Vendedor", "valores": [9064268.91, 0.0, 951208.0, 839826.0, 1159278.0, 1569245.0, 0.0, 0.0], "total": 13583825.91}, {"nombre": "CIRCULO SOCIAL HEBREO ARGENTINO", "vendedor": "Soledad", "valores": [6273311.64, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 6273311.64}, {"nombre": "SERVI SUB S.R.L.", "vendedor": "Gonzalo", "valores": [3828091.05, 3562962.59, 264063.0, 348366.0, 114163.0, 96315.0, 0.0, 0.0], "total": 8213960.64}, {"nombre": "CLINICA SAN MICHELE SOCIEDAD ANONIMA COMERCIAL E INDUSTRIAL", "vendedor": "Soledad", "valores": [3275670.16, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 3275670.16}, {"nombre": "CLEANCITI TEMPERLEY (FACUNDO CHAVES)", "vendedor": "Vendedor", "valores": [2984732.78, 0.0, 0.0, 1359518.0, 1168205.0, 0.0, 0.0, 0.0], "total": 5512455.779999999}, {"nombre": "STAMM VEGH S.A.U.", "vendedor": "Ignacio", "valores": [1750216.69, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 1750216.69}, {"nombre": "PRINGLES SAN LUIS S. A.", "vendedor": "Ignacio", "valores": [1416130.94, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 1416130.94}, {"nombre": "HARAS LOS CERROS S A (HARAS SANTA MARIA)", "vendedor": "Ignacio", "valores": [1398358.18, 0.0, 0.0, 739722.0, 0.0, 0.0, 0.0, 0.0], "total": 2138080.1799999997}, {"nombre": "CLUB DE LA MILANESA (MAPUESA S.R.L.)", "vendedor": "Gonzalo", "valores": [816522.92, 416251.81, 2100927.69, 873449.0, 1149906.56, 509799.06, 0.0, 0.0], "total": 5866857.04}, {"nombre": "NUEVA JUSTA S.R.L.", "vendedor": "Valentín", "valores": [492697.69, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 492697.69}, {"nombre": "DANDY (BOFIT S.A)", "vendedor": "Gonzalo", "valores": [478625.0, 134216.0, 164270.0, 12866.0, 0.0, 0.0, 0.0, 0.0], "total": 789977.0}, {"nombre": "CLINICA PRIVADA NEUROPSIQUIATRICA SAN CARLOS S A", "vendedor": "Soledad", "valores": [341405.45, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 341405.45}, {"nombre": "BIOBEST (BIOBEST ARGENTINA S.A.)", "vendedor": "Soledad", "valores": [319009.29, 36660.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 355669.29}, {"nombre": "INSTITUTO MARIANO MORENO SA", "vendedor": "Ignacio", "valores": [307728.15, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 307728.15}, {"nombre": "VUELO FITNESS S.A (VUELO FITNESS S.A.)", "vendedor": "Soledad", "valores": [300809.5, 0.0, 200250.35, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 501059.85}, {"nombre": "SULLIVANS IRISH PUB (BOEDO FOOD SAS)", "vendedor": "Ignacio", "valores": [259347.84, 0.0, 108840.0, 226322.12, 0.0, 0.0, 0.0, 0.0], "total": 594509.96}, {"nombre": "REBOR (REBOR SEGURIDAD SA)", "vendedor": "Soledad", "valores": [237673.37, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 237673.37}, {"nombre": "CONS PROP J B AMBROSETTI 493 95 99 99", "vendedor": "Gonzalo", "valores": [227715.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 227715.5}, {"nombre": "DON BENITO RESTO GORRITI (AGUSTIN BENITO)", "vendedor": "Ignacio", "valores": [222490.01, 0.0, 74620.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 297110.01}, {"nombre": "SAINT THOMAS OESTE (SAINT THOMAS OESTE S.A)", "vendedor": "Soledad", "valores": [219069.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 219069.0}, {"nombre": "CLEANCITI TAPIALES (TOLOZA GUILLERMO DANIEL)", "vendedor": "Vendedor", "valores": [215000.0, 0.0, 0.0, 428679.27, 5137309.75, 0.0, 0.0, 0.0], "total": 5780989.02}, {"nombre": "COLEGIO NUEVOS HORIZONTES (SAN MARTIN JUAN CRUZ -BALLESTER, JUAN FACUNDO -FERNANDEZ, MA)", "vendedor": "Soledad", "valores": [212035.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 212035.0}, {"nombre": "LA BAITA RESTO (MARIANELA BIOLI)", "vendedor": "Ignacio", "valores": [211783.8, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 211783.8}, {"nombre": "COSI MI PIACE RESTO - CAFETERIA ATENEO (DULCES ENCUENTROS SA)", "vendedor": "Ignacio", "valores": [204397.11, 0.0, 284634.93, 298442.01, 0.0, 0.0, 0.0, 0.0], "total": 787474.05}, {"nombre": "MC CARNE 2 (BARRA CAMPOS S.R.L.)", "vendedor": "Soledad", "valores": [196004.93, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 196004.93}, {"nombre": "RESCUE S.A.", "vendedor": "Soledad", "valores": [194340.64, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 194340.64}, {"nombre": "UNIDAD EDUCATIVA SANTO TOMAS SRL", "vendedor": "Gonzalo", "valores": [191573.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 191573.0}, {"nombre": "LILIANA OVIEDO", "vendedor": "Soledad", "valores": [184629.99, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 184629.99}, {"nombre": "CECILIA FANTIN", "vendedor": "Cecilia", "valores": [182656.0, 28452.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 211108.0}, {"nombre": "RADIOLOGIA DIAGNOSTICA ARGENTINA S A", "vendedor": "Soledad", "valores": [160486.99, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 160486.99}, {"nombre": "ASOCIACION COOPERADORA DEL JARDIN DE INFANTES 932", "vendedor": "Valentín", "valores": [152414.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 152414.0}, {"nombre": "FLOWBOX (FLOWBOX SA)", "vendedor": "Soledad", "valores": [140526.84, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 140526.84}, {"nombre": "BOGA CAFE Y VINOS (ANEISO JOSE MATA SANCHEZ)", "vendedor": "Ignacio", "valores": [140266.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 140266.0}, {"nombre": "MORVILLA S.R.L.", "vendedor": "Soledad", "valores": [137392.0, 82960.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 220352.0}, {"nombre": "MARGOT (MACANI SA)", "vendedor": "Cecilia", "valores": [136839.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 136839.0}, {"nombre": "CLEAR CONCEPT SAS", "vendedor": "DELIO", "valores": [136083.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 136083.5}, {"nombre": "DON BENITO RESTO ARMENIA (MANUEL BENITO)", "vendedor": "Ignacio", "valores": [135272.6, 0.0, 71390.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 206662.6}, {"nombre": "SAINT THOMAS CENTRO S.A", "vendedor": "Soledad", "valores": [134878.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 134878.0}, {"nombre": "SEGURIDAD IMPERIO 2000 SRL", "vendedor": "DELIO", "valores": [126242.04, 18587.0, 0.0, 25390.0, 136678.74, 0.0, 0.0, 0.0], "total": 306897.77999999997}, {"nombre": "CONSORCIO PROP SAAVEDRA 348/60", "vendedor": "Gonzalo", "valores": [122577.85, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 122577.85}, {"nombre": "ROCIO AVALO", "vendedor": "Cecilia", "valores": [113832.0, 0.0, 0.0, 0.0, 0.0, 12888.0, 0.0, 0.0], "total": 126720.0}, {"nombre": "MR SOCIAL S.R.L.", "vendedor": "Soledad", "valores": [112036.03, 105566.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 217602.03}, {"nombre": "LABORATORIO MICROGEN (MICROGENLAB SRL)", "vendedor": "Rocio", "valores": [111416.45, 9452.0, 54958.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 175826.45}, {"nombre": "CONSORCIO DE PROPIETARIOS MONTAÑESES 1823 25", "vendedor": "DELIO", "valores": [111032.12, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 111032.12}, {"nombre": "CALABRIA BANFIELD S.A.", "vendedor": "Soledad", "valores": [110476.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 110476.0}, {"nombre": "DELIO BRITEZ", "vendedor": "DELIO", "valores": [99107.98, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 99107.98}, {"nombre": "TEGA APAREJOS GRUAS Y APILADORAS S A", "vendedor": "Soledad", "valores": [97260.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 97260.0}, {"nombre": "REY SOHO (GUILLERMO ANIBAL TORRES)", "vendedor": "Ignacio", "valores": [97030.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 97030.0}, {"nombre": "JUAN GABRIEL ESPINDOLA", "vendedor": "Jessica", "valores": [83808.0, 0.0, 10092.0, 13898.0, 9448.0, 950.0, 0.0, 0.0], "total": 118196.0}, {"nombre": "Iglesia MDS (CERANTOLA DISPLAYS S. R. L.)", "vendedor": "Soledad", "valores": [67923.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 67923.0}, {"nombre": "Oftalmologia (PATAGONIA VISTA S. A. S.)", "vendedor": "Gonzalo", "valores": [64407.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 64407.0}, {"nombre": "CORRIENTES 6471 (CONSORCIO PROPIETARIOS AV. CORRIENTES 6471 73 75 77)", "vendedor": "Soledad", "valores": [59680.0, 422198.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 481878.0}, {"nombre": "COLEGIO SAN FRANCISCO DE ASIS", "vendedor": "Ignacio", "valores": [59600.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 59600.0}, {"nombre": "CONSORCIO PROP AV BELGRANO 1175 77", "vendedor": "Soledad", "valores": [59358.0, 0.0, 122918.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 182276.0}, {"nombre": "CLUB SOCIAL ISRAELITA SEFARDI ( RAJCHER) (CLUB SOCIAL ISRAELITA SEFARDI)", "vendedor": "Soledad", "valores": [59330.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 59330.0}, {"nombre": "BIAMER SRL", "vendedor": "Gonzalo", "valores": [54522.72, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 54522.72}, {"nombre": "BARBARA DIEZ", "vendedor": "Soledad", "valores": [51497.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 51497.0}, {"nombre": "FUEGO Y VINO CABERNET RESTO (MARJUR)", "vendedor": "Ignacio", "valores": [50050.1, 0.0, 127996.69, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 178046.79}, {"nombre": "HOTEL MARBELLA DE CASIELLES HNAS Y CIA SRL", "vendedor": "Soledad", "valores": [49579.99, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 49579.99}, {"nombre": "IGNACIO PEREZ", "vendedor": "Valentín", "valores": [47905.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 47905.0}, {"nombre": "LA GRANJITA DE ESTHER (MAXIMILIANO AVALO)", "vendedor": "Rocio", "valores": [46153.5, 0.0, 3421.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 49574.5}, {"nombre": "LIDERES CONSULTORES DE SEGURIDAD (LIDERES CONSULTORES DE SEGURIDAD SRL)", "vendedor": "Soledad", "valores": [44506.0, 0.0, 416931.0, 0.0, 426543.6, 0.0, 0.0, 0.0], "total": 887980.6}, {"nombre": "Revoltijo (AYELDANIEL S.A.)", "vendedor": "Gonzalo", "valores": [42366.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 42366.0}, {"nombre": "CRISTIAN RODRIGUEZ", "vendedor": "Valentín", "valores": [41456.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 41456.0}, {"nombre": "THAYS PARQUE LELOIR (CAMIPE EMPRENDIMIENTO DEPORTIVO S. A.)", "vendedor": "Soledad", "valores": [40500.2, 0.0, 484543.92, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 525044.12}, {"nombre": "YORAIMA JACKELINE MONSALVE RAMIREZ", "vendedor": "Soledad", "valores": [37860.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 37860.0}, {"nombre": "RABIETA BAR LOMAS (MICHIGAN MAGNTIFICENT S. A.)", "vendedor": "DELIO", "valores": [36026.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 36026.0}, {"nombre": "BEEHIVE ECO BILINGUAL SCHOOL SOCIEDAD ANONIMA", "vendedor": "Soledad", "valores": [34404.3, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 34404.3}, {"nombre": "CARNICERIA MORRES (COMERCIALIZADORA MORRES SA)", "vendedor": "Soledad", "valores": [32940.0, 1460135.87, 518801.65, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 2011877.52}, {"nombre": "JESSICA TAMARA RODRIGUEZ", "vendedor": "Juan", "valores": [29175.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 29175.0}, {"nombre": "MANUEL MAURICIO HERRERA", "vendedor": "Manuel", "valores": [25911.0, 0.0, 7271.0, 7578.0, 0.0, 24691.0, 0.0, 0.0], "total": 65451.0}, {"nombre": "Santo Vermoth y Santo Domingo (ADRIAN EZEQUIEL AVALOS)", "vendedor": "Cecilia", "valores": [25505.0, 52139.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 77644.0}, {"nombre": "ALIMENTOS MARTINES S.A.", "vendedor": "Soledad", "valores": [24742.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 24742.0}, {"nombre": "VALENTIN PEREZ", "vendedor": "Cecilia", "valores": [20109.0, 0.0, 0.0, 1349.0, 3843.0, 0.0, 0.0, 0.0], "total": 25301.0}, {"nombre": "JOSEFINA HARFOUCHE", "vendedor": "Gonzalo", "valores": [19640.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 19640.0}, {"nombre": "JEWELER GROUP S.R.L", "vendedor": "Cecilia", "valores": [19605.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 19605.0}, {"nombre": "EINER SUR S.R.L. ( AXION) (EINER SUR S.R.L.)", "vendedor": "Soledad", "valores": [13987.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 13987.0}, {"nombre": "TRADICION HOGAR S.A. (TRADICION HOGAR S. A.)", "vendedor": "Soledad", "valores": [12571.02, 142999.67, 475685.12, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 631255.81}, {"nombre": "GUGGINI SAPORI (GUGGINI COMPAÑIA DE SABORES S.R.L.)", "vendedor": "Manuel", "valores": [12140.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 12140.0}, {"nombre": "GERMAN FAJARDO", "vendedor": "Valentín", "valores": [10553.74, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 10553.74}, {"nombre": "ASOCIACION CIVIL EL AMANECER DE LOS CARTONEROS", "vendedor": "Soledad", "valores": [10500.54, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 10500.54}, {"nombre": "TESTORI (TESTORI S R L)", "vendedor": "Soledad", "valores": [9846.0, 0.0, 184146.15, 0.0, 205172.69, 170874.21, 0.0, 0.0], "total": 570039.05}, {"nombre": "LAS MONJITAS TURF S. R. L. (BENA) (LAS MONJITAS TURF S. R. L.)", "vendedor": "Rosanna", "valores": [9445.56, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 9445.56}, {"nombre": "ANALIA VERONICA LEIRO", "vendedor": "Soledad", "valores": [8281.99, 0.0, 352149.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 360430.99}, {"nombre": "H.A. EMPRENDIMIENTOS S.R.L.", "vendedor": "Gonzalo", "valores": [8265.68, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 8265.68}, {"nombre": "CANTARELLI PABLO M Y CANTARELLI MIGUEL SH", "vendedor": "Soledad", "valores": [7360.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 7360.0}, {"nombre": "MG MUJER S.R.L. ( AMME SALUD) (MG MUJER S.R.L.)", "vendedor": "Soledad", "valores": [6375.9, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 6375.9}, {"nombre": "F. J. LLAMAS S.A.", "vendedor": "Gonzalo", "valores": [5450.02, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 5450.02}, {"nombre": "MARISA TOLEDO", "vendedor": "Soledad", "valores": [4910.88, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 4910.88}, {"nombre": "BONTEY S.A", "vendedor": "Gonzalo", "valores": [4197.99, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 4197.99}, {"nombre": "SIMON VAZQUEZ VIA CARGO (SIMON ALEJANDRO VAZQUEZ)", "vendedor": "Soledad", "valores": [4082.29, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 4082.29}, {"nombre": "URBAN FIT (ALEHU GYM S.R.L.)", "vendedor": "Soledad", "valores": [3998.32, 66801.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 70799.32}, {"nombre": "MOOI FABRICA FRANX6 S.A. (FRANX6 S.A.)", "vendedor": "Ignacio", "valores": [3608.62, 0.0, 2264.98, 0.0, 0.0, 205999.89, 174309.62, 174053.43], "total": 560236.54}, {"nombre": "PINARES DE CARRASCO S. A.", "vendedor": "Valentín", "valores": [3380.03, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 3380.03}, {"nombre": "IRALA CRISTHIAN RODOLFO", "vendedor": "Soledad", "valores": [2240.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 2240.0}, {"nombre": "POLLO DEL SUR SAS", "vendedor": "Soledad", "valores": [2036.8, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 2036.8}, {"nombre": "LA PROVIDENCIA (LA PROVIDENCIA RESORT Y COUNTRY CLUB S.A.)", "vendedor": "Soledad", "valores": [1036.0, 0.0, 0.0, 0.0, 1965014.74, 50172.0, 0.0, 0.0], "total": 2016222.74}, {"nombre": "ACCADEMIA DELLA PIZZA (MESIAN S.A.)", "vendedor": "Ignacio", "valores": [926.12, 0.0, 100120.0, 100120.0, 97030.0, 108700.0, 0.0, 0.0], "total": 406896.12}, {"nombre": "CLINICA PRIVADA MONTE GRANDE SOCIEDAD ANONIMA", "vendedor": "Soledad", "valores": [21.51, 0.0, 0.0, 0.0, 1225342.0, 371336.2, 0.0, 0.0], "total": 1596699.71}, {"nombre": "COCKTAIL BAR Y DOVER BAR (SEBASTIAN ALEJANDRO BAGNIS)", "vendedor": "Soledad", "valores": [1.88, 0.0, 145022.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 145023.88}, {"nombre": "SOLEDAD SANTA MARINHA", "vendedor": "Soledad", "valores": [0.98, 58406.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 58406.98}, {"nombre": "2006 S.A.", "vendedor": "Ignacio", "valores": [0.0, 0.0, 0.0, 0.0, 404364.0, 404364.0, 0.0, 0.0], "total": 808728.0}, {"nombre": "ALMACEN DON CHICHO", "vendedor": "Soledad", "valores": [0.0, 142887.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 142887.0}, {"nombre": "ALMACEN DON CHICHO CANNING", "vendedor": "Soledad", "valores": [0.0, 245042.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 245042.0}, {"nombre": "ASOCIACION CIVIL HURLINGHAM CLUB", "vendedor": "Ignacio", "valores": [0.0, 0.0, 731070.52, 0.0, 735000.0, 0.0, 0.0, 0.0], "total": 1466070.52}, {"nombre": "ASOCIACION ODONTOLOGICA ARGENTINA", "vendedor": "Ignacio", "valores": [0.0, 73872.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 73872.0}, {"nombre": "BARRIO LOS ROBLES N 1", "vendedor": "Valentín", "valores": [0.0, 97599.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 97599.0}, {"nombre": "BIBIANA SUSANA FERREYRA", "vendedor": "Soledad", "valores": [0.0, 54714.0, 272439.0, 0.0, 325041.0, 64840.0, 0.0, 0.0], "total": 717034.0}, {"nombre": "BRIANCO CHICO DESARROLLO URBANO", "vendedor": "Soledad", "valores": [0.0, 0.0, 0.0, 399059.88, 0.0, 0.0, 0.0, 0.0], "total": 399059.88}, {"nombre": "BURGER JOINT (JAMAICAN BURGER JOINT SRL)", "vendedor": "Ignacio", "valores": [0.0, 0.0, 142200.32, 0.0, 116230.0, 0.0, 0.0, 0.0], "total": 258430.32}, {"nombre": "CANTINA RECOLETA Y CARMEN PASTA PALERMO (GCMBEER S.A.)", "vendedor": "Rosanna", "valores": [0.0, 0.0, 350315.37, 185661.82, 0.0, 0.0, 0.0, 0.0], "total": 535977.19}, {"nombre": "CENTRO DE OJOS LOMAS DE ZAMORA (PRO VISION SRL)", "vendedor": "Soledad", "valores": [0.0, 105800.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 105800.0}, {"nombre": "CENTRO ESTIMA SRL", "vendedor": "Valentín", "valores": [0.0, 0.0, 0.0, 0.0, 115854.0, 0.0, 0.0, 0.0], "total": 115854.0}, {"nombre": "CLUB SERRANO (ERICEIRA S.A.)", "vendedor": "Ignacio", "valores": [0.0, 0.0, 0.0, 160759.33, 0.0, 0.0, 0.0, 0.0], "total": 160759.33}, {"nombre": "CONSORCIO DE PROPIETARIOS VIEL 230 Y 232", "vendedor": "Soledad", "valores": [0.0, 0.0, 0.0, 0.0, 83604.0, 0.0, 0.0, 0.0], "total": 83604.0}, {"nombre": "CONSORCIO PROPIETARIOS BOLIVAR 619/21/23/27/29 (CONSORCIO PROPIETARIOS BOLIVAR 623/21/23/27/29)", "vendedor": "Soledad", "valores": [0.0, 0.0, 236938.0, 16144.0, 0.0, 0.0, 0.0, 0.0], "total": 253082.0}, {"nombre": "DISTRIBUIDORA EP (DISTRIBUIDORA EP S.R.L.)", "vendedor": "DELIO", "valores": [0.0, 14664.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 14664.0}, {"nombre": "DOSEME FACILITY SERVICE S.A.", "vendedor": "Soledad", "valores": [0.0, 0.0, 143243.76, 3236920.7, 431356.28, 60376.0, 0.0, 0.0], "total": 3871896.74}, {"nombre": "EL HORNITO SANTIAGUEÑO (SULANER SA)", "vendedor": "Ignacio", "valores": [0.0, 0.0, 749970.56, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 749970.56}, {"nombre": "EL OBRADOR (AUGUSTO DAVID REY QUENOR)", "vendedor": "Gonzalo", "valores": [0.0, 35164.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 35164.0}, {"nombre": "EL PREFERIDO DE PALERMO (EL PREFERIDO S.R.L.)", "vendedor": "Ignacio", "valores": [0.0, 0.0, 0.0, 0.0, 538147.12, 140314.73, 0.0, 0.0], "total": 678461.85}, {"nombre": "EL PREFERIDO KIOSCO DE HELADOS (SOCIAL CORAZON S.R.L)", "vendedor": "Ignacio", "valores": [0.0, 0.0, 0.0, 0.0, 0.0, 175393.41, 0.0, 0.0], "total": 175393.41}, {"nombre": "FABRICA ARGENTINA DE PORCELANAS ARMANINO S A I Y C", "vendedor": "Soledad", "valores": [0.0, 86249.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 86249.0}, {"nombre": "FIDEICOMISO EDIFICIO ATLANTIDA", "vendedor": "Ignacio", "valores": [0.0, 0.0, 435652.92, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 435652.92}, {"nombre": "FIDEICOMISO LAS LOMITAS STREET & RECEDENCE", "vendedor": "DELIO", "valores": [0.0, 0.0, 0.0, 0.0, 3500649.6, 114300.0, 0.0, 0.0], "total": 3614949.6}, {"nombre": "GESTAM ARGENTINA SA", "vendedor": "Soledad", "valores": [0.0, 0.0, 0.0, 0.0, 119368.0, 0.0, 0.0, 0.0], "total": 119368.0}, {"nombre": "GONZALO PASCUAL", "vendedor": "Valentín", "valores": [0.0, 15716.0, 0.0, 15222.0, 0.0, 0.0, 0.0, 0.0], "total": 30938.0}, {"nombre": "GRUPO GALA (VICENTINO S.A.)", "vendedor": "Ignacio", "valores": [0.0, 0.0, 0.0, 0.0, 636765.7, 1107056.03, 0.0, 0.0], "total": 1743821.73}, {"nombre": "GRUPO QUIMIGUAY (SOLUCIONES AMBIENTALES S.A.)", "vendedor": "Ignacio", "valores": [0.0, 0.0, 0.0, 0.0, 0.0, 2254311.99, 0.0, 0.0], "total": 2254311.99}, {"nombre": "HOGAR CANALE (PROPUESTA S.A)", "vendedor": "Soledad", "valores": [0.0, 0.0, 158922.68, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 158922.68}, {"nombre": "INDELAMA SRL", "vendedor": "Soledad", "valores": [0.0, 0.0, 0.0, 609447.3, 0.0, 0.0, 0.0, 0.0], "total": 609447.3}, {"nombre": "JULERIAQUE S.A (JULERIAQUE S.A.)", "vendedor": "Soledad", "valores": [0.0, 0.0, 53633.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 53633.0}, {"nombre": "MERANOL SACI", "vendedor": "Ignacio", "valores": [0.0, 0.0, 0.0, 0.0, 554596.88, 0.0, 0.0, 0.0], "total": 554596.88}, {"nombre": "NH CONSULTORES EN RRHH S.R.L", "vendedor": "Soledad", "valores": [0.0, 0.0, 0.0, 366019.26, 0.0, 94356.0, 0.0, 0.0], "total": 460375.26}, {"nombre": "PARRILLA DON JULIO (CHICO S.R.L.)", "vendedor": "Ignacio", "valores": [0.0, 0.0, 0.0, 0.0, 1696033.24, 620174.27, 0.0, 0.0], "total": 2316207.51}, {"nombre": "PATRICIA REY ( SALUD Y ESTETICA)", "vendedor": "Soledad", "valores": [0.0, 164985.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 164985.0}, {"nombre": "PURPIL S A", "vendedor": "Soledad", "valores": [0.0, 577317.01, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 577317.01}, {"nombre": "SAINT THOMAS ESTE S.A", "vendedor": "Soledad", "valores": [0.0, 0.0, 0.0, 422717.0, 0.0, 0.0, 0.0, 0.0], "total": 422717.0}, {"nombre": "SUPERMERCADO CRAZY (SUPER CRAZY S R L)", "vendedor": "Ignacio", "valores": [0.0, 0.0, 0.0, 0.0, 1892872.59, 0.0, 0.0, 0.0], "total": 1892872.59}, {"nombre": "Springwall (VAZQUEZ SOCIEDAD ANONIMA COMERCIAL INDUSTRIAL E INMOBILIARIA)", "vendedor": "Rosanna", "valores": [0.0, 0.0, 510603.31, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 510603.31}, {"nombre": "TOMATE ESTACION DE SABORES (FRESCOLLI Y BATATA S.R.L. S. R. L.)", "vendedor": "Ignacio", "valores": [0.0, 0.0, 136481.99, 178221.83, 397445.66, 541172.95, 0.0, 0.0], "total": 1253322.43}, {"nombre": "TRANSPORTES JOSE BERALDI SOCIEDAD ANONIMA", "vendedor": "Ignacio", "valores": [0.0, 0.0, 83916.0, 0.0, 0.0, 94879.97, 0.0, 0.0], "total": 178795.97}, {"nombre": "VERONICA DE LOS SANTOS", "vendedor": "Soledad", "valores": [0.0, 297628.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 297628.0}, {"nombre": "VIVIANA SGANGA", "vendedor": "Soledad", "valores": [0.0, 82933.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 82933.0}], "fecha": "26/03/2026", "kpi_dias_venc": 23.9, "kpi_dias_calle": 49.6};
+const FECHA_PROC = '26/03/2026 — GMT-3';
+const SUPA_URL   = 'https://cclzkqzrwhedkkmigfis.supabase.co';
+const SUPA_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbHprcXpyd2hlZGtrbWlnZmlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NjMxNDEsImV4cCI6MjA4OTUzOTE0MX0.WRdKrnZ_ZxzFwj4fXIoi_LUWlABcSoEP9ec3X7lHV58';
+const VENDEDORES = ["Gonzalo Pascual", "Ignacio Pérez", "Soledad Santa Marinha", "Valentín Perez", "Cecilia Fantin", "Rocio Avalo", "Rosanna", "Juan Pablo Orzechowsky", "Vendedor Franquicias"];
+const TIPOS      = ['Llamado telefónico','WhatsApp','Mail','Visita presencial','Otro'];
+const RESULTADOS = ['Prometió pagar esta semana','Prometió pagar fecha concreta','Pidió refinanciación','No contestó','En disputa / reclamo','Pagó (pendiente acreditación)'];
+
+let allClientes = [], selCliente = null, estimaciones = {};
+const today    = new Date();
+const todayStr = today.toISOString().split('T')[0];
+const todayDow = today.getDay();
+const semanaActual = new Date(today);
+semanaActual.setDate(today.getDate() - todayDow);
+const semanaStr = semanaActual.toISOString().split('T')[0];
+
+document.getElementById('nav-date').textContent = today.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'});
+document.getElementById('dash-sub').textContent = 'Procesado al ' + FECHA_PROC;
+
+async function api(path, method='GET', body=null) {
+  const opts = {method, headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':method==='POST'?'return=representation':''}};
+  if(body) opts.body = JSON.stringify(body);
+  const r = await fetch(SUPA_URL+'/rest/v1/'+path, opts);
+  if(!r.ok) throw new Error(await r.text());
+  if(r.status===204) return null;
+  return r.json();
+}
+
+function fmt(n){if(!n||n===0) return '—'; return '$'+Math.round(n).toLocaleString('es-AR');}
+function fd(d){if(!d) return '—'; const[y,m,dd]=d.split('-'); return dd+'/'+m+'/'+y;}
+function toast(msg,t='ok'){const el=document.getElementById('toast');el.textContent=msg;el.className='show '+t;setTimeout(()=>el.className='',3000);}
+function sc(f){if(!f) return ''; if(f<todayStr) return 'vencido'; if(f===todayStr) return 'hoy'; return '';}
+function rb(r){if(!r) return 'bb'; if(r.includes('Prometió')||r.includes('Pagó')) return 'bg'; if(r.includes('No contestó')) return 'ba'; if(r.includes('disputa')||r.includes('refinanciación')) return 'br'; return 'bb';}
+function rc(r){if(!r) return ''; if(r.includes('Prometió')||r.includes('Pagó')) return 'p'; if(r.includes('No contestó')) return 'n'; if(r.includes('disputa')) return 'd'; return '';}
+function esc(s){return s.replace(/'/g,"\\'");}
+
+function initDatePicker(selector){
+  flatpickr(selector,{locale:'es',dateFormat:'Y-m-d',altInput:true,altFormat:'d/m/Y',disableMobile:false});
+}
+
+// ── ESTIMACIONES ──────────────────────────────────────────
+async function loadEstimaciones(){
+  try{
+    if(todayDow===0) await api('estimaciones?semana=lt.'+semanaStr,'DELETE');
+    const rows = await api('estimaciones?semana=eq.'+semanaStr+'&select=*');
+    estimaciones = {};
+    rows.forEach(r=>estimaciones[r.cliente_nombre]=r.estimacion);
+  }catch(e){console.error('estimaciones:',e);}
+}
+async function saveEstimacion(clienteNombre,valor){
+  try{
+    const num = parseFloat(valor.replace(/\./g,'').replace(',','.').trim())||0;
+    await api('estimaciones','POST',{cliente_nombre:clienteNombre,estimacion:num,semana:semanaStr});
+    estimaciones[clienteNombre]=num;
+    toast('Estimación guardada','ok');
+  }catch(e){toast('Error al guardar','err');}
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────
+async function loadDashboard(){
+  try{
+    const [clientes,gestiones] = await Promise.all([
+      api('clientes?select=*&order=deuda_vencida.desc'),
+      api('gestiones?select=*')
+    ]);
+    const totD = clientes.reduce((a,c)=>a+(c.deuda_total||0),0);
+    const totV = clientes.reduce((a,c)=>a+(c.deuda_vencida||0),0);
+    const mora = clientes.filter(c=>c.deuda_vencida>0).length;
+    const pct  = totD?(totV/totD*100).toFixed(1):0;
+    const hoyS = new Set(gestiones.filter(g=>g.fecha_seguimiento&&g.fecha_seguimiento<=todayStr).map(g=>g.cliente_nombre)).size;
+    const h7   = new Date(today); h7.setDate(h7.getDate()-7);
+    const h7s  = h7.toISOString().split('T')[0];
+    const conG = new Set(gestiones.filter(g=>g.fecha_gestion>=h7s).map(g=>g.cliente_nombre));
+    const sinG = clientes.filter(c=>c.deuda_vencida>0&&!conG.has(c.nombre)).length;
+
+    document.getElementById('kpi-total').textContent     = fmt(totD);
+    document.getElementById('kpi-vencida').textContent   = fmt(totV);
+    document.getElementById('kpi-pct').textContent       = pct+'%';
+    document.getElementById('kpi-mora').textContent      = mora;
+    document.getElementById('kpi-dias-venc').textContent = AGING_DATA.kpi_dias_venc.toFixed(1);
+    document.getElementById('kpi-dias-calle').textContent= AGING_DATA.kpi_dias_calle.toFixed(1);
+    document.getElementById('kpi-segs').textContent      = hoyS;
+    document.getElementById('kpi-sin').textContent       = sinG;
+
+    const ultG={},proxS={};
+    gestiones.forEach(g=>{
+      if(!ultG[g.cliente_nombre]||g.fecha_gestion>ultG[g.cliente_nombre]) ultG[g.cliente_nombre]=g.fecha_gestion;
+      if(g.fecha_seguimiento&&(!proxS[g.cliente_nombre]||g.fecha_seguimiento<proxS[g.cliente_nombre])) proxS[g.cliente_nombre]=g.fecha_seguimiento;
+    });
+
+    const top20 = clientes.filter(c=>c.deuda_vencida>0).slice(0,20);
+    const sumV  = top20.reduce((a,c)=>a+(c.deuda_vencida||0),0);
+    const sumT  = top20.reduce((a,c)=>a+(c.deuda_total||0),0);
+
+    document.getElementById('top20').innerHTML =
+      top20.map(c=>{
+        const prx=proxS[c.nombre], cls=sc(prx);
+        const prxColor=cls==='vencido'?'var(--danger)':cls==='hoy'?'var(--warning)':'var(--muted)';
+        const prxHtml=prx?'<span class="lk" onclick="goSeguimientos()" style="color:'+prxColor+'">'+fd(prx)+'</span>':'<span style="color:var(--muted)">—</span>';
+        return '<tr>'
+          +'<td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span class="lk" onclick="goCliente(\''+esc(c.nombre)+'\')">'+c.nombre+'</span></td>'
+          +'<td class="num" style="color:var(--muted)">'+(c.prom_dias_vencido?c.prom_dias_vencido.toFixed(1):'—')+'</td>'
+          +'<td class="num d">'+fmt(c.deuda_vencida)+'</td>'
+          +'<td class="num">'+fmt(c.deuda_total)+'</td>'
+          +'<td style="font-size:12px">'+prxHtml+'</td></tr>';
+      }).join('')
+      +'<tr class="total-row"><td colspan="2" style="font-weight:600">TOTAL TOP 20</td>'
+      +'<td class="num d">'+fmt(sumV)+'</td><td class="num">'+fmt(sumT)+'</td><td></td></tr>';
+
+    const vends={};
+    clientes.forEach(c=>{
+      const v=c.vendedor||'Sin asignar';
+      if(!vends[v]) vends[v]={vencida:0,total:0,cnt:0,mora:0};
+      vends[v].total+=c.deuda_total||0; vends[v].vencida+=c.deuda_vencida||0; vends[v].cnt++;
+      if(c.deuda_vencida>0) vends[v].mora++;
+    });
+    document.getElementById('vend-cards').innerHTML='<div class="vend-grid">'
+      +Object.entries(vends).sort((a,b)=>b[1].vencida-a[1].vencida).map(([v,d])=>
+        '<div class="vc"><div class="vn">'+v+'</div>'
+        +'<div class="vr"><span class="vrl">Deuda vencida</span><span class="vrv" style="color:var(--danger)">'+fmt(d.vencida)+'</span></div>'
+        +'<div class="vr"><span class="vrl">Por vencer</span><span class="vrv" style="color:var(--warning)">'+fmt(d.total-d.vencida)+'</span></div>'
+        +'<div class="vr"><span class="vrl">Total</span><span class="vrv">'+fmt(d.total)+'</span></div>'
+        +'<div class="vr"><span class="vrl">Clientes en mora</span><span class="vrv">'+d.mora+' / '+d.cnt+'</span></div></div>'
+      ).join('')+'</div>';
+  }catch(e){console.error(e);}
+}
+
+// ── AGING ─────────────────────────────────────────────────
+function renderAging(data){
+  const sems=AGING_DATA.semanas;
+  const totS=sems.map((_,i)=>data.reduce((a,c)=>a+(c.valores[i]||0),0));
+  const totT=data.reduce((a,c)=>a+c.total,0);
+  const totE=data.reduce((a,c)=>a+(estimaciones[c.nombre]||0),0);
+  document.getElementById('aging-sub').textContent='Al '+AGING_DATA.fecha+' · '+data.length+' clientes';
+
+  let h='<table><thead><tr>'
+    +'<th>Cliente</th><th style="width:70px">Vend.</th>'
+    +'<th class="av r">'+sems[0]+'</th>'
+    +sems.slice(1).map(s=>'<th class="r">'+s+'</th>').join('')
+    +'<th class="r">Total</th>'
+    +'<th class="est r">Est. cobranza<br>esta semana</th>'
+    +'</tr></thead><tbody>';
+
+  data.forEach(c=>{
+    const est=estimaciones[c.nombre]||0;
+    h+='<tr>'
+      +'<td style="white-space:nowrap;max-width:250px;overflow:hidden;text-overflow:ellipsis;font-weight:500">'
+      +'<span class="lk" onclick="goCliente(\''+esc(c.nombre)+'\')">'+c.nombre+'</span></td>'
+      +'<td style="font-size:12px;color:var(--muted);white-space:nowrap">'+c.vendedor+'</td>'
+      +'<td class="num d av">'+(c.valores[0]?fmt(c.valores[0]):'—')+'</td>'
+      +c.valores.slice(1).map(v=>'<td class="num">'+(v?fmt(v):'—')+'</td>').join('')
+      +'<td class="num" style="font-weight:600">'+fmt(c.total)+'</td>'
+      +'<td class="est-input"><input type="text" value="'+(est?Math.round(est).toLocaleString('es-AR'):'')+'" placeholder="0" '
+      +'data-cliente="'+c.nombre.replace(/"/g,'&quot;')+'" '
+      +'onblur="saveEstimacion(this.dataset.cliente,this.value)" '
+      +'onkeydown="if(event.key===\'Enter\')this.blur();">'
+      +'</td></tr>';
+  });
+
+  h+='<tr class="total-row"><td colspan="2" style="font-weight:600">TOTAL</td>'
+    +'<td class="num d av">'+fmt(totS[0])+'</td>'
+    +totS.slice(1).map(v=>'<td class="num">'+fmt(v)+'</td>').join('')
+    +'<td class="num">'+fmt(totT)+'</td>'
+    +'<td class="num" style="color:var(--success)">'+(totE?fmt(totE):'—')+'</td>'
+    +'</tr></tbody></table>';
+
+  document.getElementById('aging-wrap').innerHTML=h;
+}
+function filterAging(){
+  const q=document.getElementById('aging-q').value.toLowerCase();
+  renderAging(AGING_DATA.clientes.filter(c=>c.nombre.toLowerCase().includes(q)||c.vendedor.toLowerCase().includes(q)));
+}
+
+// ── CLIENTES ──────────────────────────────────────────────
+async function loadClientes(){
+  try{
+    allClientes=await api('clientes?select=*&order=deuda_vencida.desc');
+    renderCList(allClientes);
+  }catch(e){document.getElementById('c-list').innerHTML='<div style="color:var(--danger);padding:16px">'+e.message+'</div>';}
+}
+function renderCList(list){
+  const el=document.getElementById('c-list');
+  if(!list.length){el.innerHTML='<div class="empty-state">Sin clientes</div>';return;}
+  el.innerHTML=list.map(c=>
+    '<div onclick="selC(\''+esc(c.nombre)+'\')" style="background:var(--surface);border:1px solid '+(selCliente===c.nombre?'var(--accent)':'var(--border)')+';border-radius:10px;padding:12px 14px;cursor:pointer;transition:border-color .15s;">'
+    +'<div style="font-size:13px;font-weight:500;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+c.nombre+'</div>'
+    +'<div style="display:flex;justify-content:space-between;align-items:center">'
+    +'<span style="font-size:11px;color:var(--muted)">'+(c.vendedor||'')+'</span>'
+    +'<span style="font-size:12px;font-family:var(--mono);color:'+(c.deuda_vencida>0?'var(--danger)':'var(--muted)')+'">'+fmt(c.deuda_vencida)+'</span>'
+    +'</div></div>'
+  ).join('');
+}
+function filterClientes(){
+  const q=document.getElementById('c-q').value.toLowerCase();
+  renderCList(allClientes.filter(c=>c.nombre.toLowerCase().includes(q)));
+}
+async function selC(nombre){
+  selCliente=nombre; filterClientes();
+  const panel=document.getElementById('c-panel');
+  panel.innerHTML='<div class="lo"><div class="loader"></div></div>';
+  try{
+    const [c]=await api('clientes?nombre=eq.'+encodeURIComponent(nombre)+'&select=*');
+    const gs=await api('gestiones?cliente_nombre=eq.'+encodeURIComponent(nombre)+'&select=*&order=fecha_gestion.desc,created_at.desc');
+    renderPanel(c,gs);
+  }catch(e){panel.innerHTML='<div style="color:var(--danger);padding:20px">'+e.message+'</div>';}
+}
+function renderPanel(c,gs){
+  const hist=gs.length?gs.map(g=>{
+    const cls=sc(g.fecha_seguimiento);
+    const segHtml=g.fecha_seguimiento
+      ?'<div class="gs '+(cls||'')+'">'+'Seguimiento: '
+        +(cls?'<span class="lk" onclick="goSeguimientos()" style="color:'+(cls==='vencido'?'var(--danger)':'var(--warning)')+'">'+fd(g.fecha_seguimiento)+'</span>':fd(g.fecha_seguimiento))
+        +(cls==='vencido'?' — vencido':cls==='hoy'?' — HOY':'')+'</div>':'';
+    return '<div class="gi '+rc(g.resultado)+'">'
+      +'<div class="gh"><div style="display:flex;gap:6px;flex-wrap:wrap">'
+      +'<span class="badge bb">'+g.tipo+'</span>'
+      +'<span class="badge '+rb(g.resultado)+'">'+g.resultado+'</span>'
+      +'</div><span class="gm">'+fd(g.fecha_gestion)+' · '+g.vendedor.split(' ')[0]+'</span></div>'
+      +(g.comentario?'<div class="gc">'+g.comentario+'</div>':'')+segHtml+'</div>';
+  }).join(''):'<div class="empty-state">Sin gestiones registradas</div>';
+
+  document.getElementById('c-panel').innerHTML=
+    '<div class="c-info"><div class="c-name">'+c.nombre+'</div><div class="ig">'
+    +'<div><div class="il">Deuda vencida</div><div class="iv" style="color:var(--danger)">'+fmt(c.deuda_vencida)+'</div></div>'
+    +'<div><div class="il">Deuda total</div><div class="iv">'+fmt(c.deuda_total)+'</div></div>'
+    +'<div><div class="il">Días prom.</div><div class="iv">'+(c.prom_dias_vencido?c.prom_dias_vencido.toFixed(1):'—')+'</div></div>'
+    +'<div><div class="il">Vendedor</div><div class="iv sm">'+(c.vendedor||'—')+'</div></div>'
+    +'</div></div>'
+    +'<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:12px;">'
+    +'<div style="font-size:12px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:14px">Registrar gestión</div>'
+    +'<div class="form-grid">'
+    +'<div class="form-group"><label>Vendedor</label><select id="fv">'+VENDEDORES.map(v=>'<option>'+v+'</option>').join('')+'</select></div>'
+    +'<div class="form-group"><label>Tipo</label><select id="ft">'+TIPOS.map(t=>'<option>'+t+'</option>').join('')+'</select></div>'
+    +'<div class="form-group"><label>Resultado</label><select id="fr">'+RESULTADOS.map(r=>'<option>'+r+'</option>').join('')+'</select></div>'
+    +'<div class="form-group"><label>Fecha de seguimiento</label><input type="text" id="fs" placeholder="Seleccionar fecha..." readonly></div>'
+    +'<div class="form-group full"><label>Comentario</label><textarea id="fc" placeholder="Ej: Habló con Claudia, transfiere el viernes..."></textarea></div>'
+    +'<div class="form-group full"><button class="btn btn-p" id="btn-g" onclick="guardar(\''+esc(c.nombre)+'\')">Guardar gestión</button></div>'
+    +'</div></div>'
+    +'<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;">'
+    +'<div style="font-size:12px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px">Historial ('+gs.length+')</div>'
+    +'<div class="hist">'+hist+'</div></div>';
+
+  initDatePicker('#fs');
+}
+async function guardar(nombre){
+  const btn=document.getElementById('btn-g');
+  btn.disabled=true; btn.textContent='Guardando...';
+  try{
+    const fp=document.getElementById('fs')._flatpickr;
+    const fsVal=fp&&fp.selectedDates[0]?fp.selectedDates[0].toISOString().split('T')[0]:null;
+    await api('gestiones','POST',{
+      cliente_nombre:nombre,
+      vendedor:document.getElementById('fv').value,
+      tipo:document.getElementById('ft').value,
+      resultado:document.getElementById('fr').value,
+      comentario:document.getElementById('fc').value.trim()||null,
+      fecha_gestion:todayStr,
+      fecha_seguimiento:fsVal
+    });
+    toast('Gestión guardada','ok');
+    document.getElementById('fc').value='';
+    if(fp) fp.clear();
+    await selC(nombre);
+  }catch(e){toast('Error: '+e.message,'err');btn.disabled=false;btn.textContent='Guardar gestión';}
+}
+
+// ── SEGUIMIENTOS ──────────────────────────────────────────
+async function loadSeguimientos(){
+  try{
+    const gs=await api('gestiones?fecha_seguimiento=lte.'+todayStr+'&select=*&order=fecha_seguimiento.asc');
+    const el=document.getElementById('segs-list');
+    if(!gs.length){el.innerHTML='<div class="empty-state" style="margin-top:40px">No hay seguimientos pendientes</div>';return;}
+    const byC={};
+    gs.forEach(g=>{if(!byC[g.cliente_nombre]||g.fecha_seguimiento<byC[g.cliente_nombre].fecha_seguimiento) byC[g.cliente_nombre]=g;});
+    const list=Object.values(byC).sort((a,b)=>a.fecha_seguimiento.localeCompare(b.fecha_seguimiento));
+    el.innerHTML='<div style="display:flex;flex-direction:column;gap:8px;">'
+      +list.map(g=>{
+        const cls=sc(g.fecha_seguimiento);
+        return '<div class="seg-item '+cls+'" onclick="goCliente(\''+esc(g.cliente_nombre)+'\')">'
+          +'<div style="flex:1;min-width:0">'
+          +'<div style="font-weight:500;font-size:13px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+g.cliente_nombre+'</div>'
+          +'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">'
+          +'<span class="badge bb">'+g.tipo+'</span>'
+          +'<span class="badge '+rb(g.resultado)+'">'+g.resultado+'</span></div>'
+          +(g.comentario?'<div style="font-size:12px;color:var(--muted);margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+g.comentario+'</div>':'')
+          +'</div>'
+          +'<div style="text-align:right;min-width:100px">'
+          +'<div style="font-size:12px;font-weight:500;color:'+(cls==='vencido'?'var(--danger)':'var(--warning)')+'">'+fd(g.fecha_seguimiento)+'</div>'
+          +'<div style="font-size:11px;color:var(--muted);margin-top:2px">'+g.vendedor.split(' ')[0]+'</div>'
+          +'</div></div>';
+      }).join('')+'</div>';
+  }catch(e){document.getElementById('segs-list').innerHTML='<div style="color:var(--danger);padding:20px">'+e.message+'</div>';}
+}
+
+// ── NAV ───────────────────────────────────────────────────
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  const idx={dashboard:0,aging:1,clientes:2,seguimientos:3};
+  document.querySelectorAll('.nav-tab')[idx[name]].classList.add('active');
+  if(name==='dashboard') loadDashboard();
+  if(name==='aging') loadEstimaciones().then(()=>renderAging(AGING_DATA.clientes));
+  if(name==='clientes') loadClientes();
+  if(name==='seguimientos') loadSeguimientos();
+}
+function goCliente(nombre){showPage('clientes');setTimeout(()=>selC(nombre),120);}
+function goSeguimientos(){showPage('seguimientos');}
+
+// Init
+loadDashboard();
+loadClientes();
+loadEstimaciones().then(()=>renderAging(AGING_DATA.clientes));
+</script>
+</body>
+</html>
