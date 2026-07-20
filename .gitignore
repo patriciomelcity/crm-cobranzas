@@ -1,0 +1,6 @@
+# Ignorar todo por defecto
+*
+
+# Excepciones: solo estos archivos se suben a GitHub
+!index.html
+!.gitignore
